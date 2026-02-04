@@ -33,6 +33,14 @@
             padding: 32px 40px;
             border-bottom: 4px solid #1e3a8a;
             border-radius: 12px 12px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-content {
+            flex: 1;
         }
 
         .header h1 {
@@ -62,6 +70,25 @@
 
         .header .attribution a:hover {
             opacity: 1;
+        }
+
+        .header-btn {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .header-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.5);
         }
 
         .content {
@@ -195,6 +222,85 @@
 
         #resetSchools:hover {
             background: #b91c1c;
+        }
+
+        .beta-section {
+            background: #fefce8;
+            padding: 16px;
+            border-radius: 8px;
+            border: 2px dashed #eab308;
+            margin-bottom: 24px;
+        }
+
+        .beta-badge {
+            background: #eab308;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-left: 8px;
+        }
+
+        .upload-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .upload-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .upload-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .upload-hint {
+            font-size: 13px;
+            color: #854d0e;
+            font-style: italic;
+        }
+
+        .upload-status {
+            margin-top: 12px;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .upload-status.processing {
+            display: block;
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #93c5fd;
+        }
+
+        .upload-status.success {
+            display: block;
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #6ee7b7;
+        }
+
+        .upload-status.error {
+            display: block;
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
         }
 
         select, input[type="text"] {
@@ -451,20 +557,32 @@
 
             .header {
                 padding: 24px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
             }
 
             .header h1 {
                 font-size: 22px;
             }
+
+            .header-btn {
+                width: 100%;
+                text-align: center;
+            }
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>West Country Schools Trust</h1>
-            <p>Distance Checker</p>
-            <p class="attribution">Routes from <a href="https://openrouteservice.org" target="_blank">openrouteservice.org</a> • Correct as of 02/02/26</p>
+            <div class="header-content">
+                <h1>West Country Schools Trust</h1>
+                <p>Distance Checker</p>
+                <p class="attribution">Routes from <a href="https://openrouteservice.org" target="_blank">openrouteservice.org</a> • Correct as of 02/02/26</p>
+            </div>
+            <button class="header-btn" id="downloadFullMatrixHeader">📥 Download Full Distance Matrix</button>
         </div>
 
         <div class="content">
@@ -478,10 +596,6 @@
                     <button class="unit-btn active" data-unit="km">Kilometers</button>
                     <button class="unit-btn" data-unit="miles">Miles</button>
                 </div>
-            </div>
-
-            <div style="text-align: center; margin-bottom: 20px;">
-                <button class="hq-btn" id="downloadFullMatrix" style="margin: 0;">📥 Download Full Distance Matrix</button>
             </div>
 
             <div class="quick-check active">
@@ -511,6 +625,18 @@
             </div>
 
             <div class="multiple-check">
+                <div class="section beta-section">
+                    <div class="section-title">
+                        📸 Upload Diary Screenshot <span class="beta-badge">BETA</span>
+                    </div>
+                    <div class="upload-area">
+                        <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+                        <button class="upload-btn" id="uploadBtn">📤 Choose Image</button>
+                        <span class="upload-hint">Upload a screenshot of your diary/calendar to auto-detect school names</span>
+                    </div>
+                    <div id="uploadStatus" class="upload-status"></div>
+                </div>
+
                 <div class="section">
                     <div class="section-title">
                         Select Schools
@@ -739,7 +865,108 @@
                 updateMatrix();
             });
 
-            document.getElementById('downloadFullMatrix').addEventListener('click', downloadFullMatrix);
+            document.getElementById('downloadFullMatrixHeader').addEventListener('click', downloadFullMatrix);
+
+            // Image upload for beta feature
+            document.getElementById('uploadBtn').addEventListener('click', () => {
+                document.getElementById('imageUpload').click();
+            });
+
+            document.getElementById('imageUpload').addEventListener('change', handleImageUpload);
+        }
+
+        async function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const statusDiv = document.getElementById('uploadStatus');
+            statusDiv.className = 'upload-status processing';
+            statusDiv.textContent = '🔄 Processing image... This may take a moment.';
+
+            try {
+                // Use Tesseract.js to extract text from image
+                const { data: { text } } = await Tesseract.recognize(file, 'eng', {
+                    logger: info => {
+                        if (info.status === 'recognizing text') {
+                            const progress = Math.round(info.progress * 100);
+                            statusDiv.textContent = `🔄 Processing image... ${progress}%`;
+                        }
+                    }
+                });
+
+                // Find school names in the extracted text
+                const foundSchools = findSchoolsInText(text);
+
+                if (foundSchools.length > 0) {
+                    // Add found schools to selection
+                    foundSchools.forEach(school => {
+                        if (!selectedSchools.includes(school)) {
+                            selectedSchools.push(school);
+                        }
+                    });
+                    updateSchoolChips();
+                    updateMatrix();
+
+                    statusDiv.className = 'upload-status success';
+                    statusDiv.textContent = `✅ Found ${foundSchools.length} school(s): ${foundSchools.join(', ')}`;
+                } else {
+                    statusDiv.className = 'upload-status error';
+                    statusDiv.textContent = '⚠️ No school names detected in the image. Try a clearer screenshot or add schools manually.';
+                }
+
+                // Clear the file input
+                event.target.value = '';
+
+                // Hide status after 10 seconds
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 10000);
+
+            } catch (error) {
+                console.error('OCR Error:', error);
+                statusDiv.className = 'upload-status error';
+                statusDiv.textContent = '❌ Error processing image. Please try again or add schools manually.';
+
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 10000);
+            }
+        }
+
+        function findSchoolsInText(text) {
+            const found = [];
+            const textLower = text.toLowerCase();
+
+            // Check each school name (and common abbreviations)
+            sortedSchools.forEach(school => {
+                const schoolLower = school.toLowerCase();
+
+                // Check for full school name
+                if (textLower.includes(schoolLower)) {
+                    found.push(school);
+                    return;
+                }
+
+                // Check for partial matches (e.g., "Morley" for "Morley Meadow Primary School")
+                const words = schoolLower.split(' ');
+                const mainWords = words.filter(w =>
+                    w !== 'primary' &&
+                    w !== 'school' &&
+                    w !== 'academy' &&
+                    w !== 'college' &&
+                    w !== 'community' &&
+                    w.length > 3
+                );
+
+                // If any significant word from the school name appears, consider it a match
+                const hasMatch = mainWords.some(word => textLower.includes(word));
+                if (hasMatch && mainWords.length > 0) {
+                    found.push(school);
+                }
+            });
+
+            // Remove duplicates
+            return [...new Set(found)];
         }
 
         function updateQuickCheck() {
