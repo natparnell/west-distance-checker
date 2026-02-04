@@ -189,6 +189,14 @@
             background: #047857;
         }
 
+        #resetSchools {
+            background: #dc2626;
+        }
+
+        #resetSchools:hover {
+            background: #b91c1c;
+        }
+
         select, input[type="text"] {
             width: 100%;
             padding: 12px 14px;
@@ -513,6 +521,7 @@
                         <button class="clear-btn" id="clearMultiple">×</button>
                     </div>
                     <div class="school-chips" id="selectedSchools"></div>
+                    <button class="hq-btn" id="resetSchools" style="margin-top: 12px; background: #dc2626; display: none;">🗑️ Reset Schools</button>
                 </div>
 
                 <div id="matrixResult" class="distance-matrix"></div>
@@ -525,13 +534,23 @@
     <script>
         const schools = Object.keys(distanceData.km);
         let currentUnit = 'km';
-        let currentMode = 'quick';
+        let currentMode = localStorage.getItem('currentMode') || 'quick';
         let selectedSchools = [];
 
         function init() {
             populateSelects();
             attachEventListeners();
+            restoreMode();
             setMorleyAsDefault();
+        }
+
+        function restoreMode() {
+            // Restore the last selected mode
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.mode === currentMode);
+            });
+            document.querySelector('.quick-check').classList.toggle('active', currentMode === 'quick');
+            document.querySelector('.multiple-check').classList.toggle('active', currentMode === 'multiple');
         }
 
         const sortedSchools = [...schools].sort();
@@ -684,6 +703,7 @@
                     document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
                     e.target.classList.add('active');
                     currentMode = e.target.dataset.mode;
+                    localStorage.setItem('currentMode', currentMode);
 
                     document.querySelector('.quick-check').classList.toggle('active', currentMode === 'quick');
                     document.querySelector('.multiple-check').classList.toggle('active', currentMode === 'multiple');
@@ -711,6 +731,12 @@
                     updateSchoolChips();
                     updateMatrix();
                 }
+            });
+
+            document.getElementById('resetSchools').addEventListener('click', () => {
+                selectedSchools = [];
+                updateSchoolChips();
+                updateMatrix();
             });
 
             document.getElementById('downloadFullMatrix').addEventListener('click', downloadFullMatrix);
@@ -763,6 +789,14 @@
                     <button onclick="removeSchool('${school.replace(/'/g, "\\'")}')">×</button>
                 </div>
             `).join('');
+
+            // Show/hide reset button
+            const resetBtn = document.getElementById('resetSchools');
+            if (selectedSchools.length >= 1) {
+                resetBtn.style.display = 'inline-block';
+            } else {
+                resetBtn.style.display = 'none';
+            }
         }
 
         function updateMatrix() {
@@ -797,12 +831,19 @@
             html += '</tbody></table>';
             container.innerHTML = html;
 
-            // Show/hide download button
+            // Show/hide download and reset buttons
             const downloadBtn = document.getElementById('downloadCsv');
+            const resetBtn = document.getElementById('resetSchools');
             if (selectedSchools.length >= 2) {
                 downloadBtn.style.display = 'inline-block';
             } else {
                 downloadBtn.style.display = 'none';
+            }
+
+            if (selectedSchools.length >= 1) {
+                resetBtn.style.display = 'inline-block';
+            } else {
+                resetBtn.style.display = 'none';
             }
         }
 
