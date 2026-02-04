@@ -157,6 +157,7 @@
             gap: 10px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            flex-wrap: nowrap;
         }
 
         .badge {
@@ -180,6 +181,8 @@
             cursor: pointer;
             transition: all 0.2s;
             margin-left: auto;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
         .hq-btn:hover {
@@ -498,9 +501,6 @@
 
                 <div id="quickResult"></div>
             </div>
-
-            <div class="multiple-check">
-                <div class="section">
     <script>
 const distanceData = {
   "km": {
@@ -2493,6 +2493,9 @@ const distanceData = {
   }
 };
     </script>
+            <div class="multiple-check">
+                <div class="section">
+                    <div class="section-title">
                         Select Schools
                         <button class="hq-btn" id="addMorleyMultiple">📍 Add Morley (HQ)</button>
                     </div>
