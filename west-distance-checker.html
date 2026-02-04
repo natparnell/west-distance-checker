@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>West Country Schools Trust - Distance Checker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            overflow: visible;
+        }
+
+        .header {
+            background: #1e40af;
+            color: white;
+            padding: 32px 40px;
+            border-bottom: 4px solid #1e3a8a;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .header h1 {
+            font-size: 26px;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .header p {
+            opacity: 0.95;
+            font-size: 15px;
+            font-weight: 400;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .controls-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .unit-toggle {
+            display: flex;
+            gap: 0;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .unit-btn {
+            padding: 8px 20px;
+            border: none;
+            background: white;
+            color: #374151;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+            border-right: 1px solid #d1d5db;
+        }
+
+        .unit-btn:last-child {
+            border-right: none;
+        }
+
+        .unit-btn.active {
+            background: #1e40af;
+            color: white;
+        }
+
+        .unit-btn:hover:not(.active) {
+            background: #f3f4f6;
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 0;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .mode-btn {
+            padding: 8px 24px;
+            border: none;
+            background: white;
+            color: #374151;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+            border-right: 1px solid #d1d5db;
+        }
+
+        .mode-btn:last-child {
+            border-right: none;
+        }
+
+        .mode-btn.active {
+            background: #1e40af;
+            color: white;
+        }
+
+        .mode-btn:hover:not(.active) {
+            background: #f3f4f6;
+        }
+
+        .section {
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge {
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .hq-btn {
+            background: #059669;
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-left: auto;
+        }
+
+        .hq-btn:hover {
+            background: #047857;
+        }
+
+        select, input[type="text"] {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 15px;
+            color: #111827;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        input[type="text"] {
+            cursor: text;
+        }
+
+        select:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: #1e40af;
+            box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+        }
+
+        select:hover, input[type="text"]:hover {
+            border-color: #9ca3af;
+        }
+
+        .autocomplete {
+            position: relative;
+            width: 100%;
+        }
+
+        .clear-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #9ca3af;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            line-height: 1;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .clear-btn:hover {
+            background: #6b7280;
+        }
+
+        .clear-btn.visible {
+            display: flex;
+        }
+
+        .autocomplete-items {
+            position: absolute;
+            border: 1px solid #d1d5db;
+            border-top: none;
+            z-index: 1000;
+            top: 100%;
+            left: 0;
+            right: 0;
+            max-height: 200px;
+            overflow-y: auto;
+            background: white;
+            border-radius: 0 0 6px 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .autocomplete-items div {
+            padding: 10px 14px;
+            cursor: pointer;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .autocomplete-items div:hover {
+            background-color: #f3f4f6;
+        }
+
+        .autocomplete-active {
+            background-color: #1e40af !important;
+            color: white;
+        }
+
+        .quick-check {
+            display: none;
+        }
+
+        .quick-check.active {
+            display: block;
+        }
+
+        .multiple-check {
+            display: none;
+        }
+
+        .multiple-check.active {
+            display: block;
+        }
+
+        .school-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 16px;
+            min-height: 44px;
+            padding: 12px;
+            background: #f9fafb;
+            border-radius: 8px;
+            border: 1px dashed #d1d5db;
+        }
+
+        .school-chips:empty::after {
+            content: 'Select schools from the dropdown above...';
+            color: #9ca3af;
+            font-size: 14px;
+        }
+
+        .chip {
+            background: #1e40af;
+            color: white;
+            padding: 8px 12px 8px 16px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .chip button {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            line-height: 1;
+            padding: 2px 6px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .chip button:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .result {
+            margin-top: 24px;
+            padding: 24px;
+            background: #1e40af;
+            color: white;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .result-label {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .result-value {
+            font-size: 36px;
+            font-weight: 700;
+        }
+
+        .distance-matrix {
+            margin-top: 24px;
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            font-size: 14px;
+        }
+
+        th, td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        th {
+            background: #f9fafb;
+            color: #111827;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            position: sticky;
+            top: 0;
+        }
+
+        td:first-child, th:first-child {
+            font-weight: 600;
+            background: #f9fafb;
+            position: sticky;
+            left: 0;
+            border-right: 1px solid #e5e7eb;
+        }
+
+        th:first-child {
+            z-index: 2;
+        }
+
+        td {
+            text-align: center;
+            color: #374151;
+        }
+
+        td:first-child {
+            text-align: left;
+            color: #111827;
+        }
+
+        tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        .error {
+            background: #fef2f2;
+            color: #991b1b;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 16px;
+            border: 1px solid #fecaca;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .controls-row {
+                flex-direction: column;
+                gap: 16px;
+                align-items: stretch;
+            }
+
+            .content {
+                padding: 24px;
+            }
+
+            .header {
+                padding: 24px;
+            }
+
+            .header h1 {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>West Country Schools Trust</h1>
+            <p>Distance Checker</p>
+        </div>
+
+        <div class="content">
+            <div class="controls-row">
+                <div class="mode-selector">
+                    <button class="mode-btn active" data-mode="quick">Quick Check</button>
+                    <button class="mode-btn" data-mode="multiple">Multiple Journeys</button>
+                </div>
+
+                <div class="unit-toggle">
+                    <button class="unit-btn active" data-unit="km">Kilometers</button>
+                    <button class="unit-btn" data-unit="miles">Miles</button>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-bottom: 20px;">
+                <button class="hq-btn" id="downloadFullMatrix" style="margin: 0;">📥 Download Full Distance Matrix</button>
+            </div>
+
+            <div class="quick-check active">
+                <div class="section">
+                    <div class="section-title">
+                        From
+                        <span class="badge">HQ</span>
+                        <button class="hq-btn" id="setMorleyFrom">📍 Set to Morley</button>
+                    </div>
+                    <div class="autocomplete">
+                        <input type="text" id="fromSchool" placeholder="Type to search schools...">
+                        <button class="clear-btn" id="clearFrom">×</button>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">
+                        To
+                        <button class="hq-btn" id="setMorleyTo">📍 Set to Morley</button>
+                    </div>
+                    <div class="autocomplete">
+                        <input type="text" id="toSchool" placeholder="Type to search schools...">
+                        <button class="clear-btn" id="clearTo">×</button>
+                    </div>
+                </div>
+
+                <div id="quickResult"></div>
+            </div>
+
+            <div class="multiple-check">
+                <div class="section">
+                    <div class="section-title">
+                        Select Schools
+                        <button class="hq-btn" id="addMorleyMultiple">📍 Add Morley</button>
+                    </div>
+                    <div class="autocomplete">
+                        <input type="text" id="schoolSelect" placeholder="Type to search and add schools...">
+                        <button class="clear-btn" id="clearMultiple">×</button>
+                    </div>
+                    <div class="school-chips" id="selectedSchools"></div>
+                </div>
+
+                <div id="matrixResult" class="distance-matrix"></div>
+                <button class="hq-btn" id="downloadCsv" style="margin-top: 16px; display: none;">📥 Download CSV</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="distance-data.js"></script>
+    <script>
+        const schools = Object.keys(distanceData.km);
+        let currentUnit = 'km';
+        let currentMode = 'quick';
+        let selectedSchools = [];
+
+        function init() {
+            populateSelects();
+            attachEventListeners();
+            setMorleyAsDefault();
+        }
+
+        const sortedSchools = [...schools].sort();
+
+        function setupClearButton(inputElement, clearButton, callback) {
+            // Show/hide clear button based on input value
+            const toggleClearButton = () => {
+                if (inputElement.value) {
+                    clearButton.classList.add('visible');
+                } else {
+                    clearButton.classList.remove('visible');
+                }
+            };
+
+            inputElement.addEventListener('input', toggleClearButton);
+
+            clearButton.addEventListener('click', () => {
+                inputElement.value = '';
+                clearButton.classList.remove('visible');
+                inputElement.focus();
+                if (callback) callback();
+            });
+
+            toggleClearButton(); // Initial check
+        }
+
+        function setupAutocomplete(inputElement, onSelect) {
+            let currentFocus;
+
+            inputElement.addEventListener('input', function() {
+                closeAllLists();
+                if (!this.value) return;
+
+                currentFocus = -1;
+                const val = this.value.toLowerCase();
+                const filtered = sortedSchools.filter(s => s.toLowerCase().includes(val));
+
+                if (filtered.length === 0) return;
+
+                const listDiv = document.createElement('div');
+                listDiv.className = 'autocomplete-items';
+                listDiv.id = this.id + 'autocomplete-list';
+                this.parentNode.appendChild(listDiv);
+
+                filtered.forEach(school => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.innerHTML = school;
+                    itemDiv.addEventListener('click', function() {
+                        inputElement.value = school;
+                        closeAllLists();
+                        if (onSelect) onSelect(school);
+                    });
+                    listDiv.appendChild(itemDiv);
+                });
+            });
+
+            inputElement.addEventListener('keydown', function(e) {
+                let list = document.getElementById(this.id + 'autocomplete-list');
+                if (list) {
+                    let items = list.getElementsByTagName('div');
+                    if (e.keyCode === 40) { // Down
+                        currentFocus++;
+                        addActive(items);
+                        e.preventDefault();
+                    } else if (e.keyCode === 38) { // Up
+                        currentFocus--;
+                        addActive(items);
+                        e.preventDefault();
+                    } else if (e.keyCode === 13) { // Enter
+                        e.preventDefault();
+                        if (currentFocus > -1 && items[currentFocus]) {
+                            items[currentFocus].click();
+                        }
+                    }
+                }
+            });
+
+            function addActive(items) {
+                if (!items) return;
+                removeActive(items);
+                if (currentFocus >= items.length) currentFocus = 0;
+                if (currentFocus < 0) currentFocus = items.length - 1;
+                items[currentFocus].classList.add('autocomplete-active');
+                items[currentFocus].scrollIntoView({ block: 'nearest' });
+            }
+
+            function removeActive(items) {
+                for (let i = 0; i < items.length; i++) {
+                    items[i].classList.remove('autocomplete-active');
+                }
+            }
+
+            function closeAllLists(except) {
+                const items = document.getElementsByClassName('autocomplete-items');
+                for (let i = 0; i < items.length; i++) {
+                    if (except !== items[i] && except !== inputElement) {
+                        items[i].parentNode.removeChild(items[i]);
+                    }
+                }
+            }
+
+            document.addEventListener('click', function(e) {
+                closeAllLists(e.target);
+            });
+        }
+
+        function populateSelects() {
+            const fromSchool = document.getElementById('fromSchool');
+            const toSchool = document.getElementById('toSchool');
+            const schoolSelect = document.getElementById('schoolSelect');
+
+            setupAutocomplete(fromSchool, () => updateQuickCheck());
+            setupAutocomplete(toSchool, () => updateQuickCheck());
+            setupAutocomplete(schoolSelect, (school) => {
+                if (!selectedSchools.includes(school)) {
+                    selectedSchools.push(school);
+                    updateSchoolChips();
+                    updateMatrix();
+                    schoolSelect.value = '';
+                }
+            });
+
+            // Setup clear buttons
+            setupClearButton(fromSchool, document.getElementById('clearFrom'), () => updateQuickCheck());
+            setupClearButton(toSchool, document.getElementById('clearTo'), () => updateQuickCheck());
+            setupClearButton(schoolSelect, document.getElementById('clearMultiple'));
+        }
+
+        function setMorleyAsDefault() {
+            const fromSchool = document.getElementById('fromSchool');
+            fromSchool.value = 'Morley Meadow Primary School';
+            // Trigger the clear button to show
+            const clearBtn = document.getElementById('clearFrom');
+            if (clearBtn) clearBtn.classList.add('visible');
+            updateQuickCheck();
+        }
+
+        function attachEventListeners() {
+            document.querySelectorAll('.unit-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.unit-btn').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    currentUnit = e.target.dataset.unit;
+                    updateResults();
+                });
+            });
+
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    currentMode = e.target.dataset.mode;
+
+                    document.querySelector('.quick-check').classList.toggle('active', currentMode === 'quick');
+                    document.querySelector('.multiple-check').classList.toggle('active', currentMode === 'multiple');
+                });
+            });
+
+            document.getElementById('setMorleyFrom').addEventListener('click', () => {
+                const fromSchool = document.getElementById('fromSchool');
+                fromSchool.value = 'Morley Meadow Primary School';
+                document.getElementById('clearFrom').classList.add('visible');
+                updateQuickCheck();
+            });
+
+            document.getElementById('setMorleyTo').addEventListener('click', () => {
+                const toSchool = document.getElementById('toSchool');
+                toSchool.value = 'Morley Meadow Primary School';
+                document.getElementById('clearTo').classList.add('visible');
+                updateQuickCheck();
+            });
+
+            document.getElementById('addMorleyMultiple').addEventListener('click', () => {
+                const morley = 'Morley Meadow Primary School';
+                if (!selectedSchools.includes(morley)) {
+                    selectedSchools.push(morley);
+                    updateSchoolChips();
+                    updateMatrix();
+                }
+            });
+
+            document.getElementById('downloadFullMatrix').addEventListener('click', downloadFullMatrix);
+        }
+
+        function updateQuickCheck() {
+            const from = document.getElementById('fromSchool').value;
+            const to = document.getElementById('toSchool').value;
+            const resultDiv = document.getElementById('quickResult');
+
+            if (from && to && from !== to) {
+                const distance = getDistance(from, to);
+                if (distance !== null) {
+                    const unit = currentUnit === 'km' ? 'km' : 'miles';
+                    resultDiv.innerHTML = `
+                        <div class="result">
+                            <div class="result-label">Distance</div>
+                            <div class="result-value">${distance} ${unit}</div>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = '<div class="error">Distance not available</div>';
+                }
+            } else {
+                resultDiv.innerHTML = '';
+            }
+        }
+
+        function getDistance(from, to) {
+            const data = distanceData[currentUnit];
+            if (data[from] && data[from][to] !== undefined) {
+                return data[from][to];
+            } else if (data[to] && data[to][from] !== undefined) {
+                return data[to][from];
+            }
+            return null;
+        }
+
+        function removeSchool(school) {
+            selectedSchools = selectedSchools.filter(s => s !== school);
+            updateSchoolChips();
+            updateMatrix();
+        }
+
+        function updateSchoolChips() {
+            const container = document.getElementById('selectedSchools');
+            container.innerHTML = selectedSchools.map(school => `
+                <div class="chip">
+                    <span>${school}</span>
+                    <button onclick="removeSchool('${school.replace(/'/g, "\\'")}')">×</button>
+                </div>
+            `).join('');
+        }
+
+        function updateMatrix() {
+            const container = document.getElementById('matrixResult');
+
+            if (selectedSchools.length < 2) {
+                container.innerHTML = '';
+                return;
+            }
+
+            const unit = currentUnit === 'km' ? 'km' : 'mi';
+            let html = '<table><thead><tr><th>From / To</th>';
+
+            selectedSchools.forEach(school => {
+                html += `<th>${school}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+
+            selectedSchools.forEach(fromSchool => {
+                html += `<tr><td>${fromSchool}</td>`;
+                selectedSchools.forEach(toSchool => {
+                    if (fromSchool === toSchool) {
+                        html += '<td>—</td>';
+                    } else {
+                        const distance = getDistance(fromSchool, toSchool);
+                        html += `<td>${distance !== null ? distance + ' ' + unit : 'N/A'}</td>`;
+                    }
+                });
+                html += '</tr>';
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+
+            // Show/hide download button
+            const downloadBtn = document.getElementById('downloadCsv');
+            if (selectedSchools.length >= 2) {
+                downloadBtn.style.display = 'inline-block';
+            } else {
+                downloadBtn.style.display = 'none';
+            }
+        }
+
+        function downloadCSV() {
+            if (selectedSchools.length < 2) return;
+
+            const unit = currentUnit === 'km' ? 'km' : 'miles';
+
+            // Properly escape school names with quotes
+            let csv = '"From / To",' + selectedSchools.map(s => '"' + s + '"').join(',') + '\n';
+
+            selectedSchools.forEach(fromSchool => {
+                let row = ['"' + fromSchool + '"'];
+                selectedSchools.forEach(toSchool => {
+                    if (fromSchool === toSchool) {
+                        row.push('—');
+                    } else {
+                        const distance = getDistance(fromSchool, toSchool);
+                        row.push(distance !== null ? distance + ' ' + unit : 'N/A');
+                    }
+                });
+                csv += row.join(',') + '\n';
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `west-schools-distances-${currentUnit}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        function downloadFullMatrix() {
+            const unit = currentUnit === 'km' ? 'km' : 'miles';
+
+            // Create CSV header - properly escape school names with quotes
+            let csv = '"From / To",' + sortedSchools.map(s => '"' + s + '"').join(',') + '\n';
+
+            // Create rows for all schools
+            sortedSchools.forEach(fromSchool => {
+                let row = ['"' + fromSchool + '"'];
+                sortedSchools.forEach(toSchool => {
+                    if (fromSchool === toSchool) {
+                        row.push('0');
+                    } else {
+                        const distance = getDistance(fromSchool, toSchool);
+                        row.push(distance !== null ? distance : 'N/A');
+                    }
+                });
+                csv += row.join(',') + '\n';
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `west-schools-full-distance-matrix-${currentUnit}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        function updateResults() {
+            if (currentMode === 'quick') {
+                updateQuickCheck();
+            } else {
+                updateMatrix();
+            }
+        }
+
+        window.removeSchool = removeSchool;
+
+        document.getElementById('downloadCsv').addEventListener('click', downloadCSV);
+
+        init();
+    </script>
+</body>
+</html>
