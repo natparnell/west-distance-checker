@@ -243,6 +243,22 @@
             margin-left: 8px;
         }
 
+        .security-warning {
+            background: #fef2f2;
+            border: 2px solid #dc2626;
+            border-radius: 6px;
+            padding: 12px 14px;
+            margin-top: 12px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            color: #991b1b;
+            line-height: 1.5;
+        }
+
+        .security-warning strong {
+            font-weight: 600;
+        }
+
         .upload-area {
             display: flex;
             align-items: center;
@@ -646,10 +662,12 @@
             </div>
 
             <div class="multiple-check">
-                <!-- BETA FEATURE - HIDDEN FOR NOW - Remove style="display: none;" to activate -->
-                <div class="section beta-section" style="display: none;">
+                <div class="section beta-section">
                     <div class="section-title">
                         📸 Upload Diary Screenshot <span class="beta-badge">BETA</span>
+                    </div>
+                    <div class="security-warning">
+                        ⚠️ <strong>Security Notice:</strong> Image processing happens in your browser, but avoid uploading anything confidential or containing personal data
                     </div>
                     <div class="upload-area" id="uploadArea">
                         <input type="file" id="imageUpload" accept="image/*" style="display: none;">
