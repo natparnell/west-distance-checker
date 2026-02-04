@@ -249,6 +249,17 @@
             gap: 12px;
             margin-top: 12px;
             flex-wrap: wrap;
+            padding: 20px;
+            border: 2px dashed #d97706;
+            border-radius: 8px;
+            background: #fffbeb;
+            transition: all 0.2s;
+        }
+
+        .upload-area.drag-over {
+            border-color: #2563eb;
+            background: #eff6ff;
+            transform: scale(1.02);
         }
 
         .upload-btn {
@@ -272,6 +283,16 @@
             font-size: 13px;
             color: #854d0e;
             font-style: italic;
+            flex: 1;
+        }
+
+        .upload-instruction {
+            width: 100%;
+            text-align: center;
+            font-size: 14px;
+            color: #92400e;
+            margin-top: 8px;
+            font-weight: 500;
         }
 
         .upload-status {
@@ -627,6 +648,44 @@
             <div class="multiple-check">
                 <div class="section beta-section">
                     <div class="section-title">
+                        📸 Upload Diary Screenshot <span class="beta-badge">BETA</span>
+                    </div>
+                    <div class="upload-area" id="uploadArea">
+                        <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+                        <button class="upload-btn" id="uploadBtn">📤 Choose Image</button>
+                        <span class="upload-hint">or drag and drop your screenshot here</span>
+                        <div class="upload-instruction">📋 Supports: PNG, JPG, JPEG</div>
+                    </div>
+                    <div id="uploadStatus" class="upload-status"></div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">
+                        Select Schools
+                        <button class="hq-btn" id="addMorleyMultiple">📍 Add Morley (HQ)</button>
+                    </div>
+                    <div class="autocomplete">
+                        <input type="text" id="schoolSelect" placeholder="Type to search and add schools...">
+                        <button class="clear-btn" id="clearMultiple">×</button>
+                    </div>
+                    <div class="school-chips" id="selectedSchools"></div>
+                    <button class="hq-btn" id="resetSchools" style="margin-top: 12px; background: #dc2626; display: none;">🗑️ Reset Schools</button>
+                </div>
+
+                <div id="matrixResult" class="distance-matrix"></div>
+                <button class="hq-btn" id="downloadCsv" style="margin-top: 16px; display: none;">📥 Download CSV</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="distance-data.js"></script>
+    <script>
+        const schools = Object.keys(distanceData.km);
+        let currentUnit = 'km';
+        let currentMode = localStorage.getItem('currentMode') || 'quick';
+        let selectedSchools = [];
+
+        function init() {
     <script>
 const distanceData = {
   "km": {
@@ -2619,43 +2678,6 @@ const distanceData = {
   }
 };
     </script>
-                    </div>
-                    <div class="upload-area">
-                        <input type="file" id="imageUpload" accept="image/*" style="display: none;">
-                        <button class="upload-btn" id="uploadBtn">📤 Choose Image</button>
-                        <span class="upload-hint">Upload a screenshot of your diary/calendar to auto-detect school names</span>
-                    </div>
-                    <div id="uploadStatus" class="upload-status"></div>
-                </div>
-
-                <div class="section">
-                    <div class="section-title">
-                        Select Schools
-                        <button class="hq-btn" id="addMorleyMultiple">📍 Add Morley (HQ)</button>
-                    </div>
-                    <div class="autocomplete">
-                        <input type="text" id="schoolSelect" placeholder="Type to search and add schools...">
-                        <button class="clear-btn" id="clearMultiple">×</button>
-                    </div>
-                    <div class="school-chips" id="selectedSchools"></div>
-                    <button class="hq-btn" id="resetSchools" style="margin-top: 12px; background: #dc2626; display: none;">🗑️ Reset Schools</button>
-                </div>
-
-                <div id="matrixResult" class="distance-matrix"></div>
-                <button class="hq-btn" id="downloadCsv" style="margin-top: 16px; display: none;">📥 Download CSV</button>
-            </div>
-        </div>
-    </div>
-
-    <script src="distance-data.js"></script>
-    <script>
-        const schools = Object.keys(distanceData.km);
-        let currentUnit = 'km';
-        let currentMode = localStorage.getItem('currentMode') || 'quick';
-        let selectedSchools = [];
-
-        function init() {
-            populateSelects();
             attachEventListeners();
             restoreMode();
             setMorleyAsDefault();
@@ -2864,11 +2886,52 @@ const distanceData = {
             });
 
             document.getElementById('imageUpload').addEventListener('change', handleImageUpload);
+
+            // Drag and drop functionality
+            const uploadArea = document.getElementById('uploadArea');
+
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                uploadArea.classList.add('drag-over');
+            });
+
+            uploadArea.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                uploadArea.classList.remove('drag-over');
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                uploadArea.classList.remove('drag-over');
+
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    const file = files[0];
+                    // Check if it's an image
+                    if (file.type.startsWith('image/')) {
+                        processImageFile(file);
+                    } else {
+                        const statusDiv = document.getElementById('uploadStatus');
+                        statusDiv.className = 'upload-status error';
+                        statusDiv.textContent = '❌ Please upload an image file (PNG, JPG, JPEG)';
+                        setTimeout(() => {
+                            statusDiv.style.display = 'none';
+                        }, 5000);
+                    }
+                }
+            });
         }
 
         async function handleImageUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
+            processImageFile(file);
+        }
+
+        async function processImageFile(file) {
 
             const statusDiv = document.getElementById('uploadStatus');
             statusDiv.className = 'upload-status processing';
