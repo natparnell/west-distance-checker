@@ -646,7 +646,8 @@
             </div>
 
             <div class="multiple-check">
-                <div class="section beta-section">
+                <!-- BETA FEATURE - HIDDEN FOR NOW - Remove style="display: none;" to activate -->
+                <div class="section beta-section" style="display: none;">
                     <div class="section-title">
                         📸 Upload Diary Screenshot <span class="beta-badge">BETA</span>
                     </div>
@@ -677,7 +678,6 @@
             </div>
         </div>
     </div>
-
     <script>
 const distanceData = {
   "km": {
@@ -2670,6 +2670,7 @@ const distanceData = {
   }
 };
     </script>
+    <script src="distance-data.js"></script>
     <script>
         const schools = Object.keys(distanceData.km);
         let currentUnit = 'km';
