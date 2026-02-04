@@ -678,14 +678,6 @@
         </div>
     </div>
 
-    <script src="distance-data.js"></script>
-    <script>
-        const schools = Object.keys(distanceData.km);
-        let currentUnit = 'km';
-        let currentMode = localStorage.getItem('currentMode') || 'quick';
-        let selectedSchools = [];
-
-        function init() {
     <script>
 const distanceData = {
   "km": {
@@ -2678,6 +2670,14 @@ const distanceData = {
   }
 };
     </script>
+    <script>
+        const schools = Object.keys(distanceData.km);
+        let currentUnit = 'km';
+        let currentMode = localStorage.getItem('currentMode') || 'quick';
+        let selectedSchools = [];
+
+        function init() {
+            populateSelects();
             attachEventListeners();
             restoreMode();
             setMorleyAsDefault();
