@@ -47,6 +47,23 @@
             font-weight: 400;
         }
 
+        .header .attribution {
+            opacity: 0.75;
+            font-size: 12px;
+            margin-top: 8px;
+            font-weight: 300;
+        }
+
+        .header .attribution a {
+            color: white;
+            text-decoration: underline;
+            opacity: 0.9;
+        }
+
+        .header .attribution a:hover {
+            opacity: 1;
+        }
+
         .content {
             padding: 40px;
         }
@@ -436,6 +453,7 @@
         <div class="header">
             <h1>West Country Schools Trust</h1>
             <p>Distance Checker</p>
+            <p class="attribution">Routes from <a href="https://openrouteservice.org" target="_blank">openrouteservice.org</a> • Correct as of 02/02/26</p>
         </div>
 
         <div class="content">
@@ -459,8 +477,7 @@
                 <div class="section">
                     <div class="section-title">
                         From
-                        <span class="badge">HQ</span>
-                        <button class="hq-btn" id="setMorleyFrom">📍 Set to Morley</button>
+                        <button class="hq-btn" id="setMorleyFrom">📍 Set to Morley (HQ)</button>
                     </div>
                     <div class="autocomplete">
                         <input type="text" id="fromSchool" placeholder="Type to search schools...">
@@ -471,7 +488,7 @@
                 <div class="section">
                     <div class="section-title">
                         To
-                        <button class="hq-btn" id="setMorleyTo">📍 Set to Morley</button>
+                        <button class="hq-btn" id="setMorleyTo">📍 Set to Morley (HQ)</button>
                     </div>
                     <div class="autocomplete">
                         <input type="text" id="toSchool" placeholder="Type to search schools...">
@@ -486,7 +503,7 @@
                 <div class="section">
                     <div class="section-title">
                         Select Schools
-                        <button class="hq-btn" id="addMorleyMultiple">📍 Add Morley</button>
+                        <button class="hq-btn" id="addMorleyMultiple">📍 Add Morley (HQ)</button>
                     </div>
                     <div class="autocomplete">
                         <input type="text" id="schoolSelect" placeholder="Type to search and add schools...">
