@@ -216,6 +216,10 @@
             background: #047857;
         }
 
+        #setWoodfordFrom:hover, #setWoodfordTo:hover, #addWoodfordMultiple:hover {
+            background: #6d28d9 !important;
+        }
+
         #resetSchools {
             background: #dc2626;
         }
@@ -338,6 +342,146 @@
             background: #fee2e2;
             color: #991b1b;
             border: 1px solid #fecaca;
+        }
+
+        .journey-tracker {
+            margin-top: 24px;
+            padding: 20px;
+            background: #f0f9ff;
+            border: 2px solid #0ea5e9;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .journey-tracker.active {
+            display: block;
+        }
+
+        .journey-tracker-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0c4a6e;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .journey-list {
+            background: white;
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid #bae6fd;
+        }
+
+        .journey-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f9ff;
+            font-size: 14px;
+        }
+
+        .journey-item:last-child {
+            border-bottom: none;
+        }
+
+        .journey-route {
+            color: #0c4a6e;
+            font-weight: 500;
+        }
+
+        .journey-distance {
+            color: #0369a1;
+            font-weight: 600;
+        }
+
+        .journey-remove {
+            background: #fee2e2;
+            color: #991b1b;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 10px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .journey-remove:hover {
+            background: #fecaca;
+        }
+
+        .journey-adjustment {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .journey-adjustment label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #0c4a6e;
+        }
+
+        .journey-adjustment input {
+            width: 150px;
+            padding: 8px 12px;
+            border: 1px solid #0ea5e9;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .journey-total {
+            background: #0ea5e9;
+            color: white;
+            padding: 16px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .journey-total-label {
+            font-size: 13px;
+            opacity: 0.9;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .journey-total-value {
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .clickable-cell {
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .clickable-cell:hover {
+            background: #dbeafe !important;
+        }
+
+        .journey-hint {
+            background: #e0f2fe;
+            border: 1px solid #7dd3fc;
+            border-radius: 6px;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            color: #0c4a6e;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .journey-hint strong {
+            font-weight: 600;
         }
 
         select, input[type="text"] {
@@ -640,6 +784,7 @@
                     <div class="section-title">
                         From
                         <button class="hq-btn" id="setMorleyFrom">📍 Set to Morley (HQ)</button>
+                        <button class="hq-btn" id="setWoodfordFrom" style="background: #7c3aed;">📍 Set to Woodford</button>
                     </div>
                     <div class="autocomplete">
                         <input type="text" id="fromSchool" placeholder="Type to search schools...">
@@ -651,6 +796,7 @@
                     <div class="section-title">
                         To
                         <button class="hq-btn" id="setMorleyTo">📍 Set to Morley (HQ)</button>
+                        <button class="hq-btn" id="setWoodfordTo" style="background: #7c3aed;">📍 Set to Woodford</button>
                     </div>
                     <div class="autocomplete">
                         <input type="text" id="toSchool" placeholder="Type to search schools...">
@@ -682,6 +828,7 @@
                     <div class="section-title">
                         Select Schools
                         <button class="hq-btn" id="addMorleyMultiple">📍 Add Morley (HQ)</button>
+                        <button class="hq-btn" id="addWoodfordMultiple" style="background: #7c3aed;">📍 Add Woodford</button>
                     </div>
                     <div class="autocomplete">
                         <input type="text" id="schoolSelect" placeholder="Type to search and add schools...">
@@ -691,8 +838,29 @@
                     <button class="hq-btn" id="resetSchools" style="margin-top: 12px; background: #dc2626; display: none;">🗑️ Reset Schools</button>
                 </div>
 
+                <div class="journey-hint" id="journeyHint" style="display: none;">
+                    💡 <strong>Tip:</strong> Click on any distance in the table below to add it to your journey tracker
+                </div>
+
                 <div id="matrixResult" class="distance-matrix"></div>
                 <button class="hq-btn" id="downloadCsv" style="margin-top: 16px; display: none;">📥 Download CSV</button>
+
+                <div class="journey-tracker" id="journeyTracker">
+                    <div class="journey-tracker-title">
+                        🗺️ Journey Tracker
+                        <button class="hq-btn" id="clearJourney" style="margin-left: auto; background: #dc2626; font-size: 12px; padding: 4px 12px;">Clear Journey</button>
+                    </div>
+                    <div class="journey-list" id="journeyList"></div>
+                    <div class="journey-adjustment">
+                        <label for="journeyAdjustment">Adjustment (+/-):</label>
+                        <input type="number" id="journeyAdjustment" placeholder="0" step="0.1" value="0">
+                        <span style="font-size: 13px; color: #64748b;">(e.g., subtract return journey to home)</span>
+                    </div>
+                    <div class="journey-total">
+                        <div class="journey-total-label">Total Journey Distance</div>
+                        <div class="journey-total-value" id="journeyTotalValue">0 km</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -2694,6 +2862,7 @@ const distanceData = {
         let currentUnit = 'km';
         let currentMode = localStorage.getItem('currentMode') || 'quick';
         let selectedSchools = [];
+        let journeyLegs = []; // Array of {from, to, distance}
 
         function init() {
             populateSelects();
@@ -2882,10 +3051,33 @@ const distanceData = {
                 updateQuickCheck();
             });
 
+            document.getElementById('setWoodfordFrom').addEventListener('click', () => {
+                const fromSchool = document.getElementById('fromSchool');
+                fromSchool.value = 'Woodford Primary School';
+                document.getElementById('clearFrom').classList.add('visible');
+                updateQuickCheck();
+            });
+
+            document.getElementById('setWoodfordTo').addEventListener('click', () => {
+                const toSchool = document.getElementById('toSchool');
+                toSchool.value = 'Woodford Primary School';
+                document.getElementById('clearTo').classList.add('visible');
+                updateQuickCheck();
+            });
+
             document.getElementById('addMorleyMultiple').addEventListener('click', () => {
                 const morley = 'Morley Meadow Primary School';
                 if (!selectedSchools.includes(morley)) {
                     selectedSchools.push(morley);
+                    updateSchoolChips();
+                    updateMatrix();
+                }
+            });
+
+            document.getElementById('addWoodfordMultiple').addEventListener('click', () => {
+                const woodford = 'Woodford Primary School';
+                if (!selectedSchools.includes(woodford)) {
+                    selectedSchools.push(woodford);
                     updateSchoolChips();
                     updateMatrix();
                 }
@@ -2941,6 +3133,16 @@ const distanceData = {
                         }, 5000);
                     }
                 }
+            });
+
+            // Journey tracker event listeners
+            document.getElementById('clearJourney').addEventListener('click', () => {
+                journeyLegs = [];
+                updateJourneyTracker();
+            });
+
+            document.getElementById('journeyAdjustment').addEventListener('input', () => {
+                updateJourneyTracker();
             });
         }
 
@@ -3101,11 +3303,16 @@ const distanceData = {
 
         function updateMatrix() {
             const container = document.getElementById('matrixResult');
+            const journeyHint = document.getElementById('journeyHint');
 
             if (selectedSchools.length < 2) {
                 container.innerHTML = '';
+                journeyHint.style.display = 'none';
                 return;
             }
+
+            // Show the hint when table is displayed
+            journeyHint.style.display = 'flex';
 
             const unit = currentUnit === 'km' ? 'km' : 'mi';
             let html = '<table><thead><tr><th>From / To</th>';
@@ -3122,7 +3329,11 @@ const distanceData = {
                         html += '<td>—</td>';
                     } else {
                         const distance = getDistance(fromSchool, toSchool);
-                        html += `<td>${distance !== null ? distance + ' ' + unit : 'N/A'}</td>`;
+                        if (distance !== null) {
+                            html += `<td class="clickable-cell" onclick="addJourneyLeg('${fromSchool.replace(/'/g, "\\'")}', '${toSchool.replace(/'/g, "\\'")}', ${distance})">${distance + ' ' + unit}</td>`;
+                        } else {
+                            html += `<td>N/A</td>`;
+                        }
                     }
                 });
                 html += '</tr>';
@@ -3215,10 +3426,63 @@ const distanceData = {
                 updateQuickCheck();
             } else {
                 updateMatrix();
+                updateJourneyTracker(); // Update journey tracker when units change
             }
         }
 
+        function addJourneyLeg(from, to, distance) {
+            journeyLegs.push({ from, to, distance });
+            updateJourneyTracker();
+        }
+
+        function removeJourneyLeg(index) {
+            journeyLegs.splice(index, 1);
+            updateJourneyTracker();
+        }
+
+        function updateJourneyTracker() {
+            const tracker = document.getElementById('journeyTracker');
+            const journeyList = document.getElementById('journeyList');
+            const totalValueDiv = document.getElementById('journeyTotalValue');
+            const adjustment = parseFloat(document.getElementById('journeyAdjustment').value) || 0;
+
+            if (journeyLegs.length === 0) {
+                tracker.classList.remove('active');
+                return;
+            }
+
+            tracker.classList.add('active');
+
+            const unit = currentUnit === 'km' ? 'km' : 'miles';
+
+            // Render journey legs
+            let html = '';
+            let total = 0;
+            journeyLegs.forEach((leg, index) => {
+                total += leg.distance;
+                html += `
+                    <div class="journey-item">
+                        <span class="journey-route">${index + 1}. ${leg.from} → ${leg.to}</span>
+                        <span class="journey-distance">${leg.distance} ${unit}</span>
+                        <button class="journey-remove" onclick="removeJourneyLeg(${index})">Remove</button>
+                    </div>
+                `;
+            });
+
+            if (journeyLegs.length === 0) {
+                html = '<div style="text-align: center; color: #64748b; padding: 20px;">Click on distance cells in the table above to build your journey</div>';
+            }
+
+            journeyList.innerHTML = html;
+
+            // Calculate and display total
+            const finalTotal = total + adjustment;
+            totalValueDiv.textContent = `${finalTotal.toFixed(2)} ${unit}`;
+        }
+
         window.removeSchool = removeSchool;
+        window.addJourneyLeg = addJourneyLeg;
+        window.removeJourneyLeg = removeJourneyLeg;
 
         document.getElementById('downloadCsv').addEventListener('click', downloadCSV);
 
