@@ -228,122 +228,6 @@
             background: #b91c1c;
         }
 
-        .beta-section {
-            background: #fefce8;
-            padding: 16px;
-            border-radius: 8px;
-            border: 2px dashed #eab308;
-            margin-bottom: 24px;
-        }
-
-        .beta-badge {
-            background: #eab308;
-            color: white;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            margin-left: 8px;
-        }
-
-        .security-warning {
-            background: #fef2f2;
-            border: 2px solid #dc2626;
-            border-radius: 6px;
-            padding: 12px 14px;
-            margin-top: 12px;
-            margin-bottom: 12px;
-            font-size: 13px;
-            color: #991b1b;
-            line-height: 1.5;
-        }
-
-        .security-warning strong {
-            font-weight: 600;
-        }
-
-        .upload-area {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-top: 12px;
-            flex-wrap: wrap;
-            padding: 20px;
-            border: 2px dashed #d97706;
-            border-radius: 8px;
-            background: #fffbeb;
-            transition: all 0.2s;
-        }
-
-        .upload-area.drag-over {
-            border-color: #2563eb;
-            background: #eff6ff;
-            transform: scale(1.02);
-        }
-
-        .upload-btn {
-            background: #2563eb;
-            color: white;
-            border: none;
-            padding: 10px 18px;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
-
-        .upload-btn:hover {
-            background: #1d4ed8;
-        }
-
-        .upload-hint {
-            font-size: 13px;
-            color: #854d0e;
-            font-style: italic;
-            flex: 1;
-        }
-
-        .upload-instruction {
-            width: 100%;
-            text-align: center;
-            font-size: 14px;
-            color: #92400e;
-            margin-top: 8px;
-            font-weight: 500;
-        }
-
-        .upload-status {
-            margin-top: 12px;
-            padding: 12px;
-            border-radius: 6px;
-            font-size: 14px;
-            display: none;
-        }
-
-        .upload-status.processing {
-            display: block;
-            background: #dbeafe;
-            color: #1e40af;
-            border: 1px solid #93c5fd;
-        }
-
-        .upload-status.success {
-            display: block;
-            background: #d1fae5;
-            color: #065f46;
-            border: 1px solid #6ee7b7;
-        }
-
-        .upload-status.error {
-            display: block;
-            background: #fee2e2;
-            color: #991b1b;
-            border: 1px solid #fecaca;
-        }
-
         .journey-tracker {
             margin-top: 24px;
             padding: 20px;
@@ -753,7 +637,6 @@
             }
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -808,22 +691,6 @@
             </div>
 
             <div class="multiple-check">
-                <div class="section beta-section">
-                    <div class="section-title">
-                        📸 Upload Diary Screenshot <span class="beta-badge">BETA</span>
-                    </div>
-                    <div class="security-warning">
-                        ⚠️ <strong>Security Notice:</strong> Image processing happens in your browser, but avoid uploading anything confidential or containing personal data
-                    </div>
-                    <div class="upload-area" id="uploadArea">
-                        <input type="file" id="imageUpload" accept="image/*" style="display: none;">
-                        <button class="upload-btn" id="uploadBtn">📤 Choose Image</button>
-                        <span class="upload-hint">or drag and drop your screenshot here</span>
-                        <div class="upload-instruction">📋 Supports: PNG, JPG, JPEG</div>
-                    </div>
-                    <div id="uploadStatus" class="upload-status"></div>
-                </div>
-
                 <div class="section">
                     <div class="section-title">
                         Select Schools
@@ -3091,50 +2958,6 @@ const distanceData = {
 
             document.getElementById('downloadFullMatrixHeader').addEventListener('click', downloadFullMatrix);
 
-            // Image upload for beta feature
-            document.getElementById('uploadBtn').addEventListener('click', () => {
-                document.getElementById('imageUpload').click();
-            });
-
-            document.getElementById('imageUpload').addEventListener('change', handleImageUpload);
-
-            // Drag and drop functionality
-            const uploadArea = document.getElementById('uploadArea');
-
-            uploadArea.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                uploadArea.classList.add('drag-over');
-            });
-
-            uploadArea.addEventListener('dragleave', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                uploadArea.classList.remove('drag-over');
-            });
-
-            uploadArea.addEventListener('drop', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                uploadArea.classList.remove('drag-over');
-
-                const files = e.dataTransfer.files;
-                if (files.length > 0) {
-                    const file = files[0];
-                    // Check if it's an image
-                    if (file.type.startsWith('image/')) {
-                        processImageFile(file);
-                    } else {
-                        const statusDiv = document.getElementById('uploadStatus');
-                        statusDiv.className = 'upload-status error';
-                        statusDiv.textContent = '❌ Please upload an image file (PNG, JPG, JPEG)';
-                        setTimeout(() => {
-                            statusDiv.style.display = 'none';
-                        }, 5000);
-                    }
-                }
-            });
-
             // Journey tracker event listeners
             document.getElementById('clearJourney').addEventListener('click', () => {
                 journeyLegs = [];
@@ -3144,104 +2967,6 @@ const distanceData = {
             document.getElementById('journeyAdjustment').addEventListener('input', () => {
                 updateJourneyTracker();
             });
-        }
-
-        async function handleImageUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            processImageFile(file);
-        }
-
-        async function processImageFile(file) {
-
-            const statusDiv = document.getElementById('uploadStatus');
-            statusDiv.className = 'upload-status processing';
-            statusDiv.textContent = '🔄 Processing image... This may take a moment.';
-
-            try {
-                // Use Tesseract.js to extract text from image
-                const { data: { text } } = await Tesseract.recognize(file, 'eng', {
-                    logger: info => {
-                        if (info.status === 'recognizing text') {
-                            const progress = Math.round(info.progress * 100);
-                            statusDiv.textContent = `🔄 Processing image... ${progress}%`;
-                        }
-                    }
-                });
-
-                // Find school names in the extracted text
-                const foundSchools = findSchoolsInText(text);
-
-                if (foundSchools.length > 0) {
-                    // Add found schools to selection
-                    foundSchools.forEach(school => {
-                        if (!selectedSchools.includes(school)) {
-                            selectedSchools.push(school);
-                        }
-                    });
-                    updateSchoolChips();
-                    updateMatrix();
-
-                    statusDiv.className = 'upload-status success';
-                    statusDiv.textContent = `✅ Found ${foundSchools.length} school(s): ${foundSchools.join(', ')}`;
-                } else {
-                    statusDiv.className = 'upload-status error';
-                    statusDiv.textContent = '⚠️ No school names detected in the image. Try a clearer screenshot or add schools manually.';
-                }
-
-                // Clear the file input
-                event.target.value = '';
-
-                // Hide status after 10 seconds
-                setTimeout(() => {
-                    statusDiv.style.display = 'none';
-                }, 10000);
-
-            } catch (error) {
-                console.error('OCR Error:', error);
-                statusDiv.className = 'upload-status error';
-                statusDiv.textContent = '❌ Error processing image. Please try again or add schools manually.';
-
-                setTimeout(() => {
-                    statusDiv.style.display = 'none';
-                }, 10000);
-            }
-        }
-
-        function findSchoolsInText(text) {
-            const found = [];
-            const textLower = text.toLowerCase();
-
-            // Check each school name (and common abbreviations)
-            sortedSchools.forEach(school => {
-                const schoolLower = school.toLowerCase();
-
-                // Check for full school name
-                if (textLower.includes(schoolLower)) {
-                    found.push(school);
-                    return;
-                }
-
-                // Check for partial matches (e.g., "Morley" for "Morley Meadow Primary School")
-                const words = schoolLower.split(' ');
-                const mainWords = words.filter(w =>
-                    w !== 'primary' &&
-                    w !== 'school' &&
-                    w !== 'academy' &&
-                    w !== 'college' &&
-                    w !== 'community' &&
-                    w.length > 3
-                );
-
-                // If any significant word from the school name appears, consider it a match
-                const hasMatch = mainWords.some(word => textLower.includes(word));
-                if (hasMatch && mainWords.length > 0) {
-                    found.push(school);
-                }
-            });
-
-            // Remove duplicates
-            return [...new Set(found)];
         }
 
         function updateQuickCheck() {
